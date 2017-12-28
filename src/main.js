@@ -2,8 +2,11 @@
 require('./styles/main.scss');
 
 // scripts
-
+import map from './js/index'
 
 document.addEventListener("DOMContentLoaded", function(event) {
-    console.log('init');
+    ymaps.ready(function () {
+        console.log('ready');
+        map();
+    });
 });
