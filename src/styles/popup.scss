@@ -1,0 +1,14 @@
+.popup {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: $popup-radius;
+
+  &__header {
+    background-color: $orange;
+    padding: $popup-pudding;
+    font-size: 12px;
+    color: #fff;
+    border-radius: $popup-radius $popup-radius 0 0;
+  }
+}
