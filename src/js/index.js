@@ -1,11 +1,14 @@
 export default function () {
     let map = {
+        objects: {},
         yMap: undefined,
-        userCoords: undefined,
         init: function() {
             (async() => {
                 try {
-                    this.mapInit();
+                    let map = this.yMap = await this.mapInit();
+
+                    map.events.add('click', this.bindClick.bind(this));
+
                 } catch (e) {
                     console.error(e);
                 }
@@ -13,22 +16,19 @@ export default function () {
 
         },
         mapInit: function () {
-            (async() => {
-                try {
-                    let map = this.yMap;
+            return new Promise(function (resolve) {
+                let map;
 
-                    this.getUserCoords()
-                        .then(function (coords) {
-                            console.log(coords);
-                            map = new ymaps.Map('map', {
-                                center: coords,
-                                zoom: 12
-                            });
+                this.getUserCoords()
+                    .then(function (coords) {
+                        map = new ymaps.Map('map', {
+                            center: coords,
+                            zoom: 12
                         });
-                } catch (e) {
-                    console.error(e);
-                }
-            })();
+
+                        resolve(map);
+                    });
+            }.bind(this));
         },
         getUserCoords: function () {
             return new Promise(function (resolve) {
@@ -38,11 +38,28 @@ export default function () {
                         coords = result.geoObjects.position;
                         resolve(coords);
                     }, function(e) {
-                        console.log('2');
                         coords = [55.754347, 37.622453];
                         resolve(coords);
                     });
             });
+        },
+        bindClick: function (event) {
+            let coords = event.get('coords');
+            console.log(this);
+            this.yMap.balloon.open(coords, {
+                // contentHeader:'Событие!',
+                contentBody:'<p>Кто-то щелкнул по карте.</p>' +
+                '<p>Координаты щелчка: ' + [
+                    coords[0].toPrecision(6),
+                    coords[1].toPrecision(6)
+                ].join(', ') + '</p>',
+                // contentFooter:'<sup>Щелкните еще раз</sup>'
+            });
+
+            this.createMarker(coords);
+        },
+        createMarker: function (coordinates) {
+            this.yMap.geoObjects.add(new ymaps.Placemark(coordinates));
         }
     };
 
