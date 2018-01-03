@@ -1,0 +1,28 @@
+.form {
+  display: flex;
+  flex-direction: column;
+
+  &__title {
+    font-size: 16px;
+    color: $orange;
+    margin-bottom: 15px;
+  }
+
+  &__input,
+  &__text-area {
+    font-size: 15px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    border: 1px solid rgb(196, 196, 196);
+    border-radius: 25px;
+
+    &:last-child {
+      margin-bottom: initial;
+    }
+  }
+
+  &__text-area {
+    min-height: 130px;
+    resize: none;
+  }
+}

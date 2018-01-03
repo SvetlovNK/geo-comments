@@ -3,6 +3,11 @@
   left: 50%;
   top: 50%;
   border-radius: $popup-radius;
+  background-color: #fff;
+  width: 380px;
+  box-sizing: border-box;
+  transform: translateY(-50%);
+  display: none;
 
   &__header {
     background-color: $orange;
@@ -10,5 +15,29 @@
     font-size: 12px;
     color: #fff;
     border-radius: $popup-radius $popup-radius 0 0;
+  }
+
+  &__content {
+    padding: $popup-pudding $popup-pudding 0;
+    margin-bottom: 15px;
+  }
+
+  &__review {
+    height: 140px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgb(240, 240, 240);
+  }
+
+  &__footer {
+    padding: 0 $popup-pudding;
+    border-radius: 0 0 $popup-radius $popup-radius;
+    text-align: right;
+  }
+
+  &__send {
+    border-radius: 10px;
+    background-color: rgb(255, 134, 99);
+    color: #fff;
+    padding: 7px 15px;
   }
 }
