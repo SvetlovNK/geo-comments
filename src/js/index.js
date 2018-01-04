@@ -53,7 +53,21 @@ export default function () {
                 groupByCoordinates: false,
                 clusterDisableClickZoom: true,
                 clusterHideIconOnBalloonOpen: false,
+                clusterBalloonContentLayout: 'cluster#balloonCarousel'
             });
+
+            this.clusterer.events.add('click', function (event) {
+                var target = event.get('target');
+                let objects = target.getGeoObjects();
+
+                // TODO: Допилить функционал получения координат при клике на метки
+                console.log(objects);
+                objects.forEach(function (element) {
+                    console.log(element.geometry.getCoordinates());
+                })
+            }.bind(this));
+
+            this.yMap.geoObjects.add(this.clusterer);
         },
         bindClick: function (event) {
             let coords = event.get('coords');
@@ -65,19 +79,24 @@ export default function () {
                 closeButton: false,
                 maxHeight: 'auto',
                 layout: 'default#imageWithContent',
-                style: {
-                    background: 'black'
-                },
             });
-
-            console.log(this.yMap.balloon.isOpen());
 
             this.createMarker(coords);
         },
         createMarker: function (coordinates) {
-            this.yMap.geoObjects.add(new ymaps.Placemark(coordinates));
+            let data = {
+                clusterCaption: 'метка <strong>1</strong>'
+            };
 
-            console.log('add');
+            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            console.log(coordinates);
         }
     };
 
