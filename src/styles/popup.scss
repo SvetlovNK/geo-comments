@@ -1,13 +1,9 @@
 .popup {
-  position: absolute;
-  left: 50%;
-  top: 50%;
   border-radius: $popup-radius;
   background-color: #fff;
   width: 380px;
   box-sizing: border-box;
-  transform: translateY(-50%);
-  display: none;
+  text-align: initial;
 
   &__header {
     background-color: $orange;
@@ -29,7 +25,7 @@
   }
 
   &__footer {
-    padding: 0 $popup-pudding;
+    padding: 0 $popup-pudding $popup-pudding;
     border-radius: 0 0 $popup-radius $popup-radius;
     text-align: right;
   }
