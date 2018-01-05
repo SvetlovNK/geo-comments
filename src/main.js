@@ -1,5 +1,5 @@
 // SCSS
-require('./styles/main.scss');
+import './styles/main.scss';
 
 // scripts
 import map from './js/index'

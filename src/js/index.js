@@ -2,7 +2,7 @@ const templateElement = require('../../popup.hbs');
 
 export default function () {
     let map = {
-        objects: {},
+        places: {},
         yMap: undefined,
         cluster:undefined,
         init: function() {
@@ -71,17 +71,48 @@ export default function () {
         },
         bindClick: function (event) {
             let coords = event.get('coords');
-            const html = templateElement();
 
-            this.yMap.balloon.open(coords, {
+            if(this.yMap.balloon.isOpen()) {
+                this.yMap.balloon.close();
+            } else {
+                this.renderPopup(coords).then((template) => {
+                    this.openPopup(coords, template);
+                });
+            }
+            // this.createMarker(coords);
+        },
+        renderPopup: function (coordinates) {
+            return new Promise(resolve => {
+                let html;
+                let address;
+
+                this.getAddress(coordinates)
+                    .then(function (result) {
+                        address = result;
+
+                        let context = {
+                            address: address,
+                        };
+
+                        html = templateElement(context);
+                        resolve(html);
+                    })
+            })
+        },
+        getAddress: function (coordinates) {
+            return ymaps.geocode(coordinates).then(function (result) {
+                let object = result.geoObjects.get(0);
+                return (String(object.getAddressLine()));
+            });
+        },
+        openPopup: function (coordinates, html) {
+            this.yMap.balloon.open(coordinates, {
                 contentBody: html,
             },{
                 closeButton: false,
                 maxHeight: 'auto',
                 layout: 'default#imageWithContent',
             });
-
-            this.createMarker(coords);
         },
         createMarker: function (coordinates) {
             let data = {
@@ -89,14 +120,6 @@ export default function () {
             };
 
             this.clusterer.add(new ymaps.Placemark(coordinates, data));
-            this.clusterer.add(new ymaps.Placemark(coordinates, data));
-            this.clusterer.add(new ymaps.Placemark(coordinates, data));
-            this.clusterer.add(new ymaps.Placemark(coordinates, data));
-            this.clusterer.add(new ymaps.Placemark(coordinates, data));
-            this.clusterer.add(new ymaps.Placemark(coordinates, data));
-            this.clusterer.add(new ymaps.Placemark(coordinates, data));
-            this.clusterer.add(new ymaps.Placemark(coordinates, data));
-            console.log(coordinates);
         }
     };
 
