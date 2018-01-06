@@ -1,6 +1,8 @@
 const templateElement = require('../../popup.hbs');
 
 export default function () {
+    let mapContainer = document.querySelector('.map');
+
     let map = {
         places: {},
         yMap: undefined,
@@ -12,6 +14,7 @@ export default function () {
                     this.addClusterization();
 
                     map.events.add('click', this.bindClick.bind(this));
+                    mapContainer.addEventListener('click', this.closePopup.bind(this));
 
                 } catch (e) {
                     console.error(e);
@@ -113,6 +116,13 @@ export default function () {
                 maxHeight: 'auto',
                 layout: 'default#imageWithContent',
             });
+        },
+        closePopup: function (event) {
+          let target = event.target;
+
+          if (target.classList.contains('js-popup-close')) {
+              this.yMap.balloon.close();
+          }
         },
         createMarker: function (coordinates) {
             let data = {
