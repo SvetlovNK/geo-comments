@@ -5,25 +5,17 @@
         <i class="popup__close js-popup-close"></i>
     </header>
     <div class="popup__content">
-        <div class="popup__review">
-            <div class="review">
-                <header class="review__header">
-                    <div class="review__author">Сергей</div>
-                    <div class="review__place">Красный куб </div>
-                    <div class="review__date">12.12.2015</div>
-                    <div class="review__time">23:02:47</div>
-                </header>
-                <div class="review__content">Ужасное место! Кругом зомби!!!!</div>
-            </div>
+        <div class="popup__reviews js-popup-reviews">
+            {{{reviews}}}
         </div>
-        <form class="form">
+        <form class="form js-popup-form">
             <div class="form__title">Ваш отзыв</div>
-            <input type="text" class="form__input" placeholder="Ваше имя">
-            <input type="text" class="form__input" placeholder="Укажите место">
-            <textarea type="text" class="form__text-area" placeholder="Поделитесь впечатлениями"></textarea>
+            <input type="text" class="form__input js-popup-author js-popup-required" placeholder="Ваше имя">
+            <input type="text" class="form__input js-popup-place js-popup-required" placeholder="Укажите место">
+            <textarea type="text" class="form__text-area js-popup-comment js-popup-required" placeholder="Поделитесь впечатлениями"></textarea>
         </form>
     </div>
     <footer class="popup__footer">
-        <button class="popup__send">Добавить</button>
+        <button class="popup__send js-popup-add" data-coords="{{coordinates}}">Добавить</button>
     </footer>
 </div>

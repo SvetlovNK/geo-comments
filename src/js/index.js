@@ -1,4 +1,6 @@
-const templateElement = require('../../popup.hbs');
+const popupTemplate = require('../../popup.hbs');
+const reviewTemplate = require('../../popup-review.hbs');
+
 
 export default function () {
     let mapContainer = document.querySelector('.map');
@@ -15,6 +17,7 @@ export default function () {
 
                     map.events.add('click', this.bindClick.bind(this));
                     mapContainer.addEventListener('click', this.closePopup.bind(this));
+                    mapContainer.addEventListener('click', this.addReview.bind(this));
 
                 } catch (e) {
                     console.error(e);
@@ -74,33 +77,41 @@ export default function () {
         },
         bindClick: function (event) {
             let coords = event.get('coords');
+            coords[0] = Number(coords[0].toFixed(5));
+            coords[1] = Number(coords[1].toFixed(5));
 
             if(this.yMap.balloon.isOpen()) {
                 this.yMap.balloon.close();
             } else {
-                this.renderPopup(coords).then((template) => {
-                    this.openPopup(coords, template);
-                });
+                this.renderPopup(coords)
+                    .then((template) => {
+                        this.openPopup(coords, template);
+                    });
             }
-            // this.createMarker(coords);
         },
         renderPopup: function (coordinates) {
             return new Promise(resolve => {
-                let html;
-                let address;
-
                 this.getAddress(coordinates)
-                    .then(function (result) {
-                        address = result;
+                    .then((result) => {
+                        let html;
+                        let address = result;
+                        let rewiews = this.renderReviews();
 
                         let context = {
                             address: address,
+                            coordinates: coordinates,
+                            reviews: rewiews,
                         };
 
-                        html = templateElement(context);
+                        html = popupTemplate(context);
                         resolve(html);
                     })
             })
+        },
+        renderReviews:function (reviews) {
+          let html =  reviewTemplate(reviews);
+
+          return html;
         },
         getAddress: function (coordinates) {
             return ymaps.geocode(coordinates).then(function (result) {
@@ -123,6 +134,93 @@ export default function () {
           if (target.classList.contains('js-popup-close')) {
               this.yMap.balloon.close();
           }
+        },
+        addReview: function (event) {
+            let target = event.target;
+
+            if (target.classList.contains('js-popup-add')) {
+                let form = document.querySelector('.js-popup-form');
+                let inputs = form.querySelectorAll('.js-popup-required');
+                let authorField = form.querySelector('.js-popup-author');
+                let placeField = form.querySelector('.js-popup-place');
+                let commentField = form.querySelector('.js-popup-comment');
+                let reviews = document.querySelector('.js-popup-reviews');
+
+                if (this.validateInputs(inputs)) {
+                    let coords = target.dataset.coords;
+
+                    let review = {
+                        author: authorField.value,
+                        place: placeField.value,
+                        comment: commentField.value,
+                        date: this.getCurrentDate(),
+                        time: this.getCurrentTime()
+                    };
+
+                    if (coords in this.places) {
+                        this.places[`${coords}`].push(review);
+                    } else {
+                        this.places[`${coords}`] = new Array();
+                        this.places[`${coords}`].push(review);
+                    }
+
+                    let mapCoords = coords.split(',');
+
+                    let preparedReviews = this.renderReviews({
+                        reviews: this.places[coords]
+                    });
+
+                    this.createMarker(mapCoords);
+                    reviews.innerHTML = preparedReviews;
+                }
+            }
+        },
+        validateInputs: function (inputs) {
+            for (let i = 0; i < inputs.length; i++) {
+                let input = inputs[i];
+
+                if (input.value === '') {
+                    input.focus();
+                    input.style.outlineColor = 'red';
+
+                    return false;
+                }
+            }
+
+            return true;
+        },
+        getCurrentDate: function() {
+            const today = new Date();
+            let day = today.getDate();
+            let month = today.getMonth()+1;
+            let year = today.getFullYear();
+
+            day = this.correctTime(day);
+            month = this.correctTime(month);
+
+            const string = `${day}.${month}.${year}`;
+
+            return string
+        },
+        getCurrentTime: function () {
+            const today = new Date();
+            let hours = today.getHours();
+            let minutes = today.getMinutes();
+            let seconds = today.getSeconds();
+
+            hours = this.correctTime(hours);
+            minutes = this.correctTime(minutes);
+            seconds = this.correctTime(seconds);
+
+            const string = `${hours}:${minutes}:${seconds}`;
+
+            return string;
+        },
+        correctTime: function (item) {
+            if (item < 10) {
+                item = "0" + item;
+            }
+            return item;
         },
         createMarker: function (coordinates) {
             let data = {
