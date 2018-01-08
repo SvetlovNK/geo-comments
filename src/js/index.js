@@ -63,14 +63,16 @@ export default function () {
             });
 
             this.clusterer.events.add('click', function (event) {
-                var target = event.get('target');
-                let objects = target.getGeoObjects();
+                let target = event.get('target');
+                let coords;
 
-                // TODO: Допилить функционал получения координат при клике на метки
-                console.log(objects);
-                objects.forEach(function (element) {
-                    console.log(element.geometry.getCoordinates());
-                })
+                if (target.constructor.name != 'o') return; // Проверка на placemark
+
+                coords = target.geometry.getCoordinates();
+                this.renderPopup(coords)
+                    .then((template) => {
+                        this.openPopup(coords, template);
+                    });
             }.bind(this));
 
             this.yMap.geoObjects.add(this.clusterer);
@@ -95,7 +97,11 @@ export default function () {
                     .then((result) => {
                         let html;
                         let address = result;
-                        let rewiews = this.renderReviews();
+                        let coordsString = coordinates.toString();
+                        let place = this.places[`${coordsString}`];
+                        let rewiews = this.renderReviews({
+                            reviews: place
+                        });
 
                         let context = {
                             address: address,
@@ -227,7 +233,8 @@ export default function () {
                 clusterCaption: 'метка <strong>1</strong>'
             };
 
-            this.clusterer.add(new ymaps.Placemark(coordinates, data));
+            let placemark = new ymaps.Placemark(coordinates, data);
+            this.clusterer.add(placemark);
         }
     };
 
