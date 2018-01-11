@@ -5,7 +5,6 @@ const clusterTemplate = require('../../cluster-content.hbs');
 
 export default function () {
     let mapContainer = document.querySelector('.map');
-    let inputs = document.querySelectorAll('.js-popup-required');
 
     let map = {
         places: {},
@@ -143,11 +142,14 @@ export default function () {
             });
         },
         openPopup: function (coordinates, html) {
+            console.log('open');
             this.yMap.balloon.open(coordinates, {
                 contentBody: html,
             },{
                 closeButton: false,
                 maxHeight: 'auto',
+                offset: [-380, -568],
+                autoPan: true,
                 layout: 'default#imageWithContent',
             });
         },
