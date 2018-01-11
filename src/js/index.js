@@ -1,5 +1,6 @@
 const popupTemplate = require('../../popup.hbs');
 const reviewTemplate = require('../../popup-review.hbs');
+const clusterTemplate = require('../../cluster-content.hbs');
 
 
 export default function () {
@@ -18,6 +19,7 @@ export default function () {
                     map.events.add('click', this.bindClick.bind(this));
                     mapContainer.addEventListener('click', this.closePopup.bind(this));
                     mapContainer.addEventListener('click', this.addReview.bind(this));
+                    mapContainer.addEventListener('click', this.closeCluster.bind(this));
 
                 } catch (e) {
                     console.error(e);
@@ -76,6 +78,20 @@ export default function () {
             }.bind(this));
 
             this.yMap.geoObjects.add(this.clusterer);
+        },
+        closeCluster: function (event) {
+            let target = event.target;
+
+            if (target.classList.contains('js-cluster-coords')) {
+                let coords = target.dataset.coords;
+                let mapCoords = coords.split(',');
+
+                this.renderPopup(mapCoords)
+                    .then((template) => {
+                        this.clusterer.balloon.close();
+                        this.openPopup(mapCoords, template);
+                    });
+            }
         },
         bindClick: function (event) {
             let coords = event.get('coords');
@@ -151,6 +167,7 @@ export default function () {
                 let placeField = form.querySelector('.js-popup-place');
                 let commentField = form.querySelector('.js-popup-comment');
                 let reviews = document.querySelector('.js-popup-reviews');
+                let addressText = document.querySelector('.js-popup-title').innerHTML;
 
                 if (this.validateInputs(inputs)) {
                     let coords = target.dataset.coords;
@@ -160,7 +177,9 @@ export default function () {
                         place: placeField.value,
                         comment: commentField.value,
                         date: this.getCurrentDate(),
-                        time: this.getCurrentTime()
+                        time: this.getCurrentTime(),
+                        coordinates: coords,
+                        address: addressText,
                     };
 
                     if (coords in this.places) {
@@ -176,7 +195,7 @@ export default function () {
                         reviews: this.places[coords]
                     });
 
-                    this.createMarker(mapCoords);
+                    this.createMarker(mapCoords, review);
                     reviews.innerHTML = preparedReviews;
                 }
             }
@@ -228,9 +247,11 @@ export default function () {
             }
             return item;
         },
-        createMarker: function (coordinates) {
+        createMarker: function (coordinates, review) {
+            let html = clusterTemplate(review);
+
             let data = {
-                clusterCaption: 'метка <strong>1</strong>'
+                clusterCaption: html
             };
 
             let placemark = new ymaps.Placemark(coordinates, data);

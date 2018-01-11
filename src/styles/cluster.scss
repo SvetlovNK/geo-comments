@@ -1,0 +1,36 @@
+.cluster {
+  font-size: 14px;
+  font-weight: normal;
+  position: relative;
+  padding-bottom: 28px;
+
+  &__place {
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  &__address {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  &__comment {
+    height: 70px;
+    overflow-y: auto;
+  }
+
+  &__footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: flex-end;
+    color: $grey;
+  }
+
+  &__date {
+    margin-right: 3px;
+  }
+}
