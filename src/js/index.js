@@ -5,6 +5,7 @@ const clusterTemplate = require('../../cluster-content.hbs');
 
 export default function () {
     let mapContainer = document.querySelector('.map');
+    let inputs = document.querySelectorAll('.js-popup-required');
 
     let map = {
         places: {},
@@ -161,8 +162,8 @@ export default function () {
             let target = event.target;
 
             if (target.classList.contains('js-popup-add')) {
+                let inputs = document.querySelectorAll('.js-popup-required');
                 let form = document.querySelector('.js-popup-form');
-                let inputs = form.querySelectorAll('.js-popup-required');
                 let authorField = form.querySelector('.js-popup-author');
                 let placeField = form.querySelector('.js-popup-place');
                 let commentField = form.querySelector('.js-popup-comment');
@@ -196,8 +197,15 @@ export default function () {
                     });
 
                     this.createMarker(mapCoords, review);
+                    this.clearInputs(inputs);
+
                     reviews.innerHTML = preparedReviews;
                 }
+            }
+        },
+        clearInputs: function (inputs) {
+            for (let i = 0; i < inputs.length; i++) {
+                inputs[i].value = '';
             }
         },
         validateInputs: function (inputs) {
